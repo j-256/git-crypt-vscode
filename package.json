@@ -1,0 +1,49 @@
+{
+  "name": "git-crypt-vscode",
+  "displayName": "Git Crypt Diff",
+  "description": "View diffs of git-crypt encrypted files in VSCode",
+  "version": "0.1.0",
+  "publisher": "j-256",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["SCM Providers"],
+  "activationEvents": ["onStartupFinished"],
+  "extensionDependencies": ["vscode.git"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gitCrypt.showDiff",
+        "title": "Git Crypt: Show Diff"
+      }
+    ],
+    "menus": {
+      "scm/resourceState/context": [
+        {
+          "command": "gitCrypt.showDiff",
+          "when": "scmProvider == git"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "gitCrypt.showDiff"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "test": "node --import tsx --test test/*.test.ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.24.0",
+    "tsx": "^4.0.0",
+    "@vscode/vsce": "^3.0.0"
+  }
+}
