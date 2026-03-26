@@ -59,7 +59,7 @@ Reload VSCode after linking.
 
 ```bash
 npm run package
-code --install-extension git-crypt-vscode-0.1.0.vsix
+code --install-extension git-crypt-vscode-*.vsix
 ```
 
 ## Development

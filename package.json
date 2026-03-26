@@ -44,6 +44,8 @@
     }
   },
   "scripts": {
+    "preversion": "npm run build && npm test",
+    "vscode:prepublish": "npm run build",
     "build": "node esbuild.js",
     "watch": "node esbuild.js --watch",
     "test": "node --import tsx --test test/*.test.ts",
