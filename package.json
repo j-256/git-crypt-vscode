@@ -1,8 +1,8 @@
 {
   "name": "git-crypt-vscode",
-  "displayName": "Git Crypt Diff",
+  "displayName": "git-crypt Diff",
   "description": "View diffs of git-crypt encrypted files in VSCode",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "publisher": "j-256",
   "license": "MIT",
   "repository": {
@@ -12,9 +12,15 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["SCM Providers"],
-  "activationEvents": ["onStartupFinished"],
-  "extensionDependencies": ["vscode.git"],
+  "categories": [
+    "SCM Providers"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "extensionDependencies": [
+    "vscode.git"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -45,11 +51,14 @@
   },
   "scripts": {
     "preversion": "npm run build && npm test",
+    "postversion": "git push origin main v$npm_package_version && npm run release",
+    "release": "npm run package && gh release create v$npm_package_version git-crypt-vscode-$npm_package_version.vsix --title v$npm_package_version --generate-notes",
     "vscode:prepublish": "npm run build",
     "build": "node esbuild.js",
     "watch": "node esbuild.js --watch",
     "test": "node --import tsx --test test/*.test.ts",
-    "package": "vsce package"
+    "package": "vsce package",
+    "publish": "vsce publish"
   },
   "devDependencies": {
     "@types/vscode": "^1.85.0",

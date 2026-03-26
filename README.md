@@ -71,7 +71,7 @@ npm test          # Run unit tests
 npm run package   # Create .vsix
 ```
 
-Tests run against a real git-crypt-enabled repository (configured in test files as `TEST_REPO`).
+Tests create a temporary git-crypt repository via `test/fixture.ts` (requires `git-crypt` installed).
 
 ## Architecture
 
