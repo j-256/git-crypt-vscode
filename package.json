@@ -5,6 +5,10 @@
   "version": "0.1.0",
   "publisher": "j-256",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/j-256/git-crypt-vscode.git"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
