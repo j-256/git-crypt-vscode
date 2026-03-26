@@ -1,4 +1,4 @@
-# Git Crypt Diff
+# git-crypt Diff
 
 VSCode extension that enables viewing diffs of [git-crypt](https://github.com/AGWA/git-crypt) encrypted files.
 
@@ -34,6 +34,14 @@ Three ways to view a git-crypt diff:
 - VSCode >= 1.85.0
 
 ## Installation
+
+### From Marketplace
+
+Search "git-crypt Diff" in the Extensions view, or run:
+
+```bash
+code --install-extension j-256.git-crypt-vscode
+```
 
 ### From source (development)
 
