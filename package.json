@@ -16,11 +16,17 @@
     "commands": [
       {
         "command": "gitCrypt.showDiff",
-        "title": "Git Crypt: Show Diff"
+        "title": "Git Crypt: Show Diff",
+        "icon": "$(diff)"
       }
     ],
     "menus": {
       "scm/resourceState/context": [
+        {
+          "command": "gitCrypt.showDiff",
+          "when": "scmProvider == git",
+          "group": "inline"
+        },
         {
           "command": "gitCrypt.showDiff",
           "when": "scmProvider == git"

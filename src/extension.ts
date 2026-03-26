@@ -3,37 +3,55 @@ import { isGitCryptAvailable, isRepoUnlocked } from './git.js';
 import { GitCryptDetector } from './detector.js';
 import { resolveContent } from './contentProvider.js';
 import { GIT_CRYPT_SCHEME } from './uriUtil.js';
-import { registerDiffCommand, showDiff } from './diff.js';
+import { registerDiffCommand } from './diff.js';
 
-const GIT_CRYPT_MAGIC = '\x00GITCRYPT\x00';
+const log = vscode.window.createOutputChannel('Git Crypt');
+
+class GitCryptDecorationProvider implements vscode.FileDecorationProvider {
+  private _onDidChange = new vscode.EventEmitter<vscode.Uri | vscode.Uri[]>();
+  readonly onDidChangeFileDecorations = this._onDidChange.event;
+
+  constructor(private detector: GitCryptDetector) {}
+
+  provideFileDecoration(uri: vscode.Uri): vscode.FileDecoration | undefined {
+    if (uri.scheme !== 'file') return;
+    const match = this.detector.findRepoAndRelPath(uri.fsPath);
+    if (!match) return;
+    log.appendLine(`Decorating: ${uri.fsPath}`);
+    return new vscode.FileDecoration(
+      '\u{1F512}',
+      'Encrypted by git-crypt \u2014 use the inline diff icon to view changes',
+    );
+  }
+
+  refresh(): void {
+    this._onDidChange.fire(undefined);
+  }
+}
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  if (!(await isGitCryptAvailable())) {
+  log.appendLine('Activating git-crypt-vscode...');
+
+  const gitCryptAvailable = await isGitCryptAvailable();
+  log.appendLine(`git-crypt available: ${gitCryptAvailable}`);
+  if (!gitCryptAvailable) {
+    log.appendLine('Aborting: git-crypt not found in PATH');
     return;
   }
 
   const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
   const gitApi = gitExtension?.getAPI(1);
+  log.appendLine(`git API: ${!!gitApi}`);
   if (!gitApi) {
+    log.appendLine('Aborting: git API not available');
     return;
   }
+
+  log.appendLine(`Repositories at activation: ${gitApi.repositories.length}`);
 
   const detector = new GitCryptDetector();
 
-  // Scan all current repos
-  for (const repo of gitApi.repositories) {
-    const root = repo.rootUri.fsPath;
-    if (await isRepoUnlocked(root)) {
-      await detector.refresh(root);
-    }
-  }
-
-  // If no git-crypt files found in any repo, stay dormant
-  if (detector.getRepoRoots().every(r => !detector.hasFiles(r))) {
-    return;
-  }
-
-  // Register the content provider for git-crypt: URIs
+  // Register content provider, diff command, and file decorations eagerly
   context.subscriptions.push(
     vscode.workspace.registerTextDocumentContentProvider(GIT_CRYPT_SCHEME, {
       async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
@@ -44,37 +62,28 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   registerDiffCommand(context, detector);
 
-  // Re-scan when repos change
+  const decorationProvider = new GitCryptDecorationProvider(detector);
   context.subscriptions.push(
-    gitApi.onDidOpenRepository(async (repo: { rootUri: vscode.Uri }) => {
-      const root = repo.rootUri.fsPath;
-      if (await isRepoUnlocked(root)) {
-        await detector.refresh(root);
-      }
-    }),
+    vscode.window.registerFileDecorationProvider(decorationProvider),
   );
 
-  // Reactive intercept: detect when VSCode opens encrypted content
+  // Scan repos asynchronously -- handles both already-loaded and late-arriving repos
+  async function scanRepo(rootUri: vscode.Uri): Promise<void> {
+    const root = rootUri.fsPath;
+    if (await isRepoUnlocked(root)) {
+      await detector.refresh(root);
+      decorationProvider.refresh();
+      log.appendLine(`Scanned ${root}: ${detector.hasFiles(root) ? 'git-crypt files found' : 'no git-crypt files'}`);
+    }
+  }
+
+  for (const repo of gitApi.repositories) {
+    scanRepo(repo.rootUri);
+  }
+
   context.subscriptions.push(
-    vscode.workspace.onDidOpenTextDocument(async doc => {
-      // Only intercept git-scheme documents (the built-in git extension's blob reads)
-      if (doc.uri.scheme !== 'git') return;
-
-      const text = doc.getText();
-      if (!text.startsWith(GIT_CRYPT_MAGIC)) return;
-
-      // Extract the file path from the git URI
-      const fsPath = doc.uri.fsPath;
-      const match = detector.findRepoAndRelPath(fsPath);
-      if (!match) return;
-
-      // Close the encrypted document and open our diff instead
-      // Small delay to let VSCode finish opening the document
-      setTimeout(async () => {
-        await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-        const fileUri = vscode.Uri.file(match.repoRoot + '/' + match.relPath);
-        await showDiff(detector, fileUri);
-      }, 50);
+    gitApi.onDidOpenRepository((repo: { rootUri: vscode.Uri }) => {
+      scanRepo(repo.rootUri);
     }),
   );
 }

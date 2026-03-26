@@ -44,8 +44,16 @@ export function registerDiffCommand(
   detector: GitCryptDetector,
 ): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand('gitCrypt.showDiff', (resourceUri?: vscode.Uri) => {
-      return showDiff(detector, resourceUri);
+    vscode.commands.registerCommand('gitCrypt.showDiff', (arg?: unknown) => {
+      // SCM context menu passes a SourceControlResourceState (has .resourceUri)
+      // Command palette passes nothing; other callers may pass a Uri directly
+      let uri: vscode.Uri | undefined;
+      if (arg instanceof vscode.Uri) {
+        uri = arg;
+      } else if (arg && typeof arg === 'object' && 'resourceUri' in arg) {
+        uri = (arg as { resourceUri: vscode.Uri }).resourceUri;
+      }
+      return showDiff(detector, uri);
     }),
   );
 }
