@@ -28,6 +28,14 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Verify tag is on main
+        run: |
+          if ! git branch -r --contains "$GITHUB_SHA" | grep -q 'origin/main'; then
+            echo "Error: tag $GITHUB_REF_NAME is not on the main branch"
+            exit 1
+          fi
       - uses: actions/setup-node@v6
         with:
           node-version: 22

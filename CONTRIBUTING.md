@@ -91,11 +91,11 @@ This force-moves the tag to the current commit and pushes it, re-triggering CI.
 ### Branches
 
 - **main** -- releases happen here; `npm version` enforces this via a branch guard
-- **dev** -- CI runs tests only (no publish); merge to main when ready
+- **dev** -- CI runs tests only; publish job verifies the tag is on main before proceeding
 
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`):
 
 - **test** job runs on every push to `main`/`dev` and on PRs to `main`
-- **publish** job runs only on `v*` tags, after tests pass
+- **publish** job runs only on `v*` tags on `main`, after tests pass
