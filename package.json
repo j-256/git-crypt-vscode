@@ -12,6 +12,7 @@
   "engines": {
     "vscode": "^1.85.0"
   },
+  "keywords": ["git-crypt", "diff", "encrypted", "scm", "textconv"],
   "categories": [
     "SCM Providers"
   ],
