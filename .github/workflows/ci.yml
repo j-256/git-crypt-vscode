@@ -24,12 +24,21 @@ jobs:
     needs: test
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 22
       - run: npm ci
+      - run: npm run package
+      - name: Create or update GitHub release
+        run: |
+          gh release create "$GITHUB_REF_NAME" git-crypt-vscode-*.vsix --title "$GITHUB_REF_NAME" --generate-notes ||
+          gh release upload "$GITHUB_REF_NAME" git-crypt-vscode-*.vsix --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: npm run publish
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
