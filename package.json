@@ -20,7 +20,7 @@
     "textconv"
   ],
   "categories": [
-    "SCM Providers"
+    "Other"
   ],
   "activationEvents": [
     "onStartupFinished"
