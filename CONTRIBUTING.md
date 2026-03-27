@@ -46,11 +46,11 @@ npm test
 
 ```
 src/
+  content-provider.ts # Resolves git-crypt: URIs to decrypted content
+  detector.ts         # Cached set of git-crypt files per repository
+  diff.ts             # Diff command (opens vscode.diff editor)
   extension.ts        # Activation, wiring, file decoration provider
   git.ts              # Low-level git/git-crypt command helpers (execFile, no shell)
-  detector.ts         # Cached set of git-crypt files per repository
-  content-provider.ts # Resolves git-crypt: URIs to decrypted content
-  diff.ts             # Diff command (opens vscode.diff editor)
   uri-util.ts         # Encode/decode git-crypt: URI scheme
 ```
 

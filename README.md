@@ -23,7 +23,7 @@ Git-crypt files are decorated with a lock badge so you can identify them at a gl
 
 Three ways to view a git-crypt diff:
 
-1. **Inline icon** -- hover over a git-crypt file in the Source Control Changes list and click the diff icon
+1. **Inline icon** -- hover over any file in the Source Control Changes list and click the diff icon (opens a decrypted diff for git-crypt files, or a normal diff otherwise)
 2. **Right-click** -- right-click a file in the Source Control panel and select "Git Crypt: Show Diff"
 3. **Command Palette** -- open a git-crypt file, then run `Git Crypt: Show Diff` from the palette
 

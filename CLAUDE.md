@@ -17,11 +17,11 @@ npm run package   # Create .vsix package
 
 ```
 src/
+  content-provider.ts # resolveContent(): decodes git-crypt: URI -> decrypted text
+  detector.ts         # GitCryptDetector: cached Set<string> of git-crypt files per repo
+  diff.ts             # showDiff(), registerDiffCommand(): opens vscode.diff editor
   extension.ts        # Activation, FileDecorationProvider, wiring
   git.ts              # execFile wrappers for git and git-crypt commands
-  detector.ts         # GitCryptDetector: cached Set<string> of git-crypt files per repo
-  content-provider.ts # resolveContent(): decodes git-crypt: URI -> decrypted text
-  diff.ts             # showDiff(), registerDiffCommand(): opens vscode.diff editor
   uri-util.ts         # encode/decode git-crypt://<hash>/<ref>/<path>?<repoRoot> URIs
 test/
   fixture.ts          # Creates temporary git-crypt repo for tests
