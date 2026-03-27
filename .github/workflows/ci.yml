@@ -32,6 +32,13 @@ jobs:
         with:
           node-version: 22
       - run: npm ci
+      - name: Verify tag matches package.json version
+        run: |
+          PKG_VERSION="v$(node -p 'require("./package.json").version')"
+          if [ "$PKG_VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "Error: tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
       - run: npm run package
       - name: Create or update GitHub release
         run: |
