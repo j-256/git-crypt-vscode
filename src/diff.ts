@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'node:path';
 import { GitCryptDetector } from './detector.js';
-import { encodeGitCryptUri, GIT_CRYPT_SCHEME } from './uriUtil.js';
+import { encodeGitCryptUri } from './uriUtil.js';
 
 export async function showDiff(
   detector: GitCryptDetector,
@@ -15,7 +15,7 @@ export async function showDiff(
   }
 
   if (!fileUri || fileUri.scheme !== 'file') {
-    vscode.window.showWarningMessage('Git Crypt: No file selected');
+    vscode.window.showWarningMessage('git-crypt Diff: No file selected');
     return;
   }
 
@@ -23,7 +23,8 @@ export async function showDiff(
   const match = detector.findRepoAndRelPath(absolutePath);
 
   if (!match) {
-    vscode.window.showWarningMessage('Git Crypt: This file is not managed by git-crypt');
+    // Not a git-crypt file -- fall through to the built-in git diff
+    await vscode.commands.executeCommand('git.openChange', fileUri);
     return;
   }
 

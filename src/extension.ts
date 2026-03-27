@@ -5,7 +5,7 @@ import { resolveContent } from './contentProvider.js';
 import { GIT_CRYPT_SCHEME } from './uriUtil.js';
 import { registerDiffCommand } from './diff.js';
 
-const log = vscode.window.createOutputChannel('Git Crypt');
+const log = vscode.window.createOutputChannel('git-crypt Diff');
 
 class GitCryptDecorationProvider implements vscode.FileDecorationProvider {
   private _onDidChange = new vscode.EventEmitter<vscode.Uri | vscode.Uri[]>();
