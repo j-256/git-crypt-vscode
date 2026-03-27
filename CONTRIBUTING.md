@@ -49,9 +49,9 @@ src/
   extension.ts        # Activation, wiring, file decoration provider
   git.ts              # Low-level git/git-crypt command helpers (execFile, no shell)
   detector.ts         # Cached set of git-crypt files per repository
-  contentProvider.ts  # Resolves git-crypt: URIs to decrypted content
+  content-provider.ts # Resolves git-crypt: URIs to decrypted content
   diff.ts             # Diff command (opens vscode.diff editor)
-  uriUtil.ts          # Encode/decode git-crypt: URI scheme
+  uri-util.ts         # Encode/decode git-crypt: URI scheme
 ```
 
 The extension activates lazily (`onStartupFinished`), checks for `git-crypt` availability, scans workspace repositories for git-crypt files via `git check-attr`, and registers commands and providers. All git interaction uses `execFile` with array arguments (no shell) to prevent command injection.

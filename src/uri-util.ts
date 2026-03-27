@@ -1,12 +1,12 @@
 import * as crypto from 'node:crypto';
 
-const SCHEME = 'git-crypt';
+export const GIT_CRYPT_SCHEME = 'git-crypt';
 
 export function encodeGitCryptUri(repoRoot: string, ref: string, relPath: string): string {
   const rootHash = crypto.createHash('sha256').update(repoRoot).digest('hex').slice(0, 8);
   // Store repoRoot in query so it survives URI encoding round-trips
   const query = encodeURIComponent(repoRoot);
-  return `${SCHEME}://${rootHash}/${encodeURIComponent(ref)}/${relPath}?${query}`;
+  return `${GIT_CRYPT_SCHEME}://${rootHash}/${encodeURIComponent(ref)}/${relPath}?${query}`;
 }
 
 export interface DecodedGitCryptUri {
@@ -16,15 +16,15 @@ export interface DecodedGitCryptUri {
 }
 
 export function decodeGitCryptUri(uriString: string): DecodedGitCryptUri {
-  if (!uriString.startsWith(`${SCHEME}://`)) {
-    throw new Error(`Not a ${SCHEME} URI: ${uriString}`);
+  if (!uriString.startsWith(`${GIT_CRYPT_SCHEME}://`)) {
+    throw new Error(`Not a ${GIT_CRYPT_SCHEME} URI: ${uriString}`);
   }
 
   // Parse: git-crypt://<hash>/<ref>/<relPath>?<repoRoot>
-  const withoutScheme = uriString.slice(`${SCHEME}://`.length);
+  const withoutScheme = uriString.slice(`${GIT_CRYPT_SCHEME}://`.length);
   const queryIdx = withoutScheme.indexOf('?');
   if (queryIdx === -1) {
-    throw new Error(`Malformed ${SCHEME} URI (missing query): ${uriString}`);
+    throw new Error(`Malformed ${GIT_CRYPT_SCHEME} URI (missing query): ${uriString}`);
   }
 
   const pathPart = withoutScheme.slice(0, queryIdx);
@@ -33,13 +33,13 @@ export function decodeGitCryptUri(uriString: string): DecodedGitCryptUri {
   // pathPart = "<hash>/<ref>/<relPath>"
   const firstSlash = pathPart.indexOf('/');
   if (firstSlash === -1) {
-    throw new Error(`Malformed ${SCHEME} URI (missing ref): ${uriString}`);
+    throw new Error(`Malformed ${GIT_CRYPT_SCHEME} URI (missing ref): ${uriString}`);
   }
 
   const afterHash = pathPart.slice(firstSlash + 1);
   const secondSlash = afterHash.indexOf('/');
   if (secondSlash === -1) {
-    throw new Error(`Malformed ${SCHEME} URI (missing path): ${uriString}`);
+    throw new Error(`Malformed ${GIT_CRYPT_SCHEME} URI (missing path): ${uriString}`);
   }
 
   const ref = decodeURIComponent(afterHash.slice(0, secondSlash));
@@ -47,5 +47,3 @@ export function decodeGitCryptUri(uriString: string): DecodedGitCryptUri {
 
   return { repoRoot, ref, relPath };
 }
-
-export const GIT_CRYPT_SCHEME = SCHEME;

@@ -20,9 +20,9 @@ src/
   extension.ts        # Activation, FileDecorationProvider, wiring
   git.ts              # execFile wrappers for git and git-crypt commands
   detector.ts         # GitCryptDetector: cached Set<string> of git-crypt files per repo
-  contentProvider.ts  # resolveContent(): decodes git-crypt: URI -> decrypted text
+  content-provider.ts # resolveContent(): decodes git-crypt: URI -> decrypted text
   diff.ts             # showDiff(), registerDiffCommand(): opens vscode.diff editor
-  uriUtil.ts          # encode/decode git-crypt://<hash>/<ref>/<path>?<repoRoot> URIs
+  uri-util.ts         # encode/decode git-crypt://<hash>/<ref>/<path>?<repoRoot> URIs
 test/
   fixture.ts          # Creates temporary git-crypt repo for tests
   *.test.ts           # Unit tests (node:test + tsx)

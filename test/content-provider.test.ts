@@ -1,7 +1,7 @@
 import { describe, it, before, after } from 'node:test';
 import * as assert from 'node:assert/strict';
-import { resolveContent } from '../src/contentProvider.js';
-import { encodeGitCryptUri } from '../src/uriUtil.js';
+import { resolveContent } from '../src/content-provider.js';
+import { encodeGitCryptUri } from '../src/uri-util.js';
 import { createFixture, destroyFixture, type TestFixture } from './fixture.js';
 
 let fixture: TestFixture;

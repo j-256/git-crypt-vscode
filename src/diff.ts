@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'node:path';
 import { GitCryptDetector } from './detector.js';
-import { encodeGitCryptUri } from './uriUtil.js';
+import { encodeGitCryptUri } from './uri-util.js';
 
 export async function showDiff(
   detector: GitCryptDetector,

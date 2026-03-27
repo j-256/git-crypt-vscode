@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { isGitCryptAvailable, isRepoUnlocked } from './git.js';
 import { GitCryptDetector } from './detector.js';
-import { resolveContent } from './contentProvider.js';
-import { GIT_CRYPT_SCHEME } from './uriUtil.js';
+import { resolveContent } from './content-provider.js';
+import { GIT_CRYPT_SCHEME } from './uri-util.js';
 import { registerDiffCommand } from './diff.js';
 
 const log = vscode.window.createOutputChannel('git-crypt Diff');

@@ -1,5 +1,5 @@
 import { getTextConv } from './git.js';
-import { decodeGitCryptUri } from './uriUtil.js';
+import { decodeGitCryptUri } from './uri-util.js';
 
 export async function resolveContent(uriString: string): Promise<string> {
   const { repoRoot, ref, relPath } = decodeGitCryptUri(uriString);

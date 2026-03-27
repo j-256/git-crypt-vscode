@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import * as assert from 'node:assert/strict';
-import { encodeGitCryptUri, decodeGitCryptUri } from '../src/uriUtil.js';
+import { encodeGitCryptUri, decodeGitCryptUri } from '../src/uri-util.js';
 
 describe('encodeGitCryptUri', () => {
   it('encodes a repo root, ref, and path into a URI string', () => {
