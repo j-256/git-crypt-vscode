@@ -2,7 +2,7 @@
   "name": "git-crypt-vscode",
   "displayName": "git-crypt Diff",
   "description": "View diffs of git-crypt encrypted files in VSCode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "j-256",
   "license": "MIT",
   "repository": {
@@ -12,7 +12,13 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "keywords": ["git-crypt", "diff", "encrypted", "scm", "textconv"],
+  "keywords": [
+    "git-crypt",
+    "diff",
+    "encrypted",
+    "scm",
+    "textconv"
+  ],
   "categories": [
     "SCM Providers"
   ],
