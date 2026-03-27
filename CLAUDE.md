@@ -44,6 +44,19 @@ Tests create a temporary git-crypt repo via `test/fixture.ts` (requires `git-cry
 - Content resolution (decrypted output)
 - Detector file matching and path resolution
 
+## Release Workflow
+
+`npm version patch` (or minor/major) handles the entire release:
+
+1. **preversion** -- branch guard (must be on `main`), build, test
+2. Version bump, commit, `v*` tag
+3. **postversion** -- pushes commit + tag to origin
+4. CI: tests -> tag/version mismatch check -> package -> GitHub release -> marketplace publish
+
+Recovery from CI failure: `npm run retag` (force-moves tag to HEAD, re-triggers CI).
+
+Branches: `main` (releases), `dev` (test-only CI, no publish).
+
 ## Installation (Development)
 
 Symlink into your VSCode extensions directory and rebuild:

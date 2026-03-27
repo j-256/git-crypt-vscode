@@ -1,5 +1,7 @@
 # git-crypt Diff
 
+[![CI](https://github.com/j-256/git-crypt-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/j-256/git-crypt-vscode/actions/workflows/ci.yml)
+
 VSCode extension that enables viewing diffs of [git-crypt](https://github.com/AGWA/git-crypt) encrypted files.
 
 ## The Problem
@@ -33,9 +35,7 @@ Three ways to view a git-crypt diff:
 - Repository must be unlocked (`git-crypt unlock`)
 - VSCode >= 1.85.0
 
-## Installation
-
-### From Marketplace
+## Install
 
 Search "git-crypt Diff" in the Extensions view, or run:
 
@@ -43,63 +43,15 @@ Search "git-crypt Diff" in the Extensions view, or run:
 code --install-extension j-256.git-crypt-vscode
 ```
 
-### From source (development)
-
-```bash
-git clone <repo-url> && cd git-crypt-vscode
-npm install
-npm run build
-```
-
-Then symlink into your VSCode extensions directory:
-
-```bash
-# Standard VSCode
-ln -sf "$(pwd)" ~/.vscode/extensions/git-crypt-vscode
-
-# Portable VSCode (e.g. code-portable-data)
-ln -sf "$(pwd)" /path/to/code-portable-data/extensions/git-crypt-vscode
-```
-
-Reload VSCode after linking.
-
-### As a VSIX
-
-```bash
-npm run package
-code --install-extension git-crypt-vscode-*.vsix
-```
-
-## Development
-
-```bash
-npm run build     # Build once
-npm run watch     # Build on change
-npm test          # Run unit tests
-npm run package   # Create .vsix
-```
-
-Tests create a temporary git-crypt repository via `test/fixture.ts` (requires `git-crypt` installed).
-
-## Architecture
-
-```
-src/
-  extension.ts        # Activation, wiring, file decoration provider
-  git.ts              # Low-level git/git-crypt command helpers (execFile, no shell)
-  detector.ts         # Cached set of git-crypt files per repository
-  contentProvider.ts  # Resolves git-crypt: URIs to decrypted content
-  diff.ts             # Diff command (opens vscode.diff editor)
-  uriUtil.ts          # Encode/decode git-crypt: URI scheme
-```
-
-The extension activates lazily (`onStartupFinished`), checks for `git-crypt` availability, scans workspace repositories for git-crypt files via `git check-attr`, and registers commands and providers. All git interaction uses `execFile` with array arguments (no shell) to prevent command injection.
-
 ## Known Limitations
 
 - Cannot intercept the built-in SCM double-click (owned by `vscode.git`)
 - Only diffs against HEAD (no multi-ref support)
 - The lock badge appears on all git-crypt files in the file explorer, not just changed ones
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, architecture, and release workflow.
 
 ## License
 

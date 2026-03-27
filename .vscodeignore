@@ -2,6 +2,7 @@
 .gitignore
 .vsixignore
 CLAUDE.md
+CONTRIBUTING.md
 esbuild.js
 tsconfig.json
 src/
