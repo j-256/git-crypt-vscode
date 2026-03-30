@@ -29,8 +29,18 @@ class GitCryptDecorationProvider implements vscode.FileDecorationProvider {
   }
 }
 
+// Dirs to append to PATH so git-crypt is discoverable by all extensions
+const EXTRA_PATH_DIRS = ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin'];
+
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   log.appendLine('Activating git-crypt-vscode...');
+
+  // Augment process PATH before any git operations -- this also fixes the
+  // built-in git extension's child processes (e.g. git add triggering the
+  // git-crypt clean filter)
+  const currentPath = process.env.PATH ?? '';
+  const missing = EXTRA_PATH_DIRS.filter(d => !currentPath.split(':').includes(d));
+  if (missing.length) process.env.PATH = `${currentPath}:${missing.join(':')}`;
 
   const gitCryptAvailable = await isGitCryptAvailable();
   log.appendLine(`git-crypt available: ${gitCryptAvailable}`);

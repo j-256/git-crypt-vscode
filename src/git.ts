@@ -10,28 +10,9 @@ export interface GitResult {
 
 const DEFAULT_TIMEOUT = 5000;
 
-// Extra dirs to search for git-crypt (extension host PATH is often minimal)
-const EXTRA_PATH_DIRS = [
-  '/opt/homebrew/bin',
-  '/usr/local/bin',
-  '/usr/bin',
-];
-
-// Augmented PATH for all child processes
-let augmentedPath: string | undefined;
-
-function getEnv(): NodeJS.ProcessEnv {
-  if (!augmentedPath) {
-    const existing = process.env.PATH ?? '';
-    const dirs = EXTRA_PATH_DIRS.filter(d => !existing.split(':').includes(d));
-    augmentedPath = dirs.length ? `${existing}:${dirs.join(':')}` : existing;
-  }
-  return { ...process.env, PATH: augmentedPath };
-}
-
 export function gitExec(cwd: string, args: string[], timeout = DEFAULT_TIMEOUT): Promise<GitResult> {
   return new Promise(resolve => {
-    execFile('git', args, { cwd, timeout, maxBuffer: 10 * 1024 * 1024, env: getEnv() }, (error, stdout, stderr) => {
+    execFile('git', args, { cwd, timeout, maxBuffer: 10 * 1024 * 1024 }, (error, stdout, stderr) => {
       resolve({
         stdout: stdout ?? '',
         stderr: stderr ?? '',
@@ -43,7 +24,7 @@ export function gitExec(cwd: string, args: string[], timeout = DEFAULT_TIMEOUT):
 
 export async function isGitCryptAvailable(): Promise<boolean> {
   return new Promise(resolve => {
-    execFile('git-crypt', ['--version'], { timeout: 3000, env: getEnv() }, error => {
+    execFile('git-crypt', ['--version'], { timeout: 3000 }, error => {
       resolve(!error);
     });
   });
@@ -71,7 +52,7 @@ export async function getGitCryptFiles(repoRoot: string): Promise<Set<string>> {
     const proc = execFile(
       'git',
       ['check-attr', 'filter', '--stdin'],
-      { cwd: repoRoot, timeout: DEFAULT_TIMEOUT, maxBuffer: 10 * 1024 * 1024, env: getEnv() },
+      { cwd: repoRoot, timeout: DEFAULT_TIMEOUT, maxBuffer: 10 * 1024 * 1024 },
       (error, stdout, stderr) => {
         resolve({
           stdout: stdout ?? '',
