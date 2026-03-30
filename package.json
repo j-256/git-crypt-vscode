@@ -2,7 +2,7 @@
   "name": "git-crypt-vscode",
   "displayName": "git-crypt Diff",
   "description": "View diffs of git-crypt encrypted files in VSCode",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "publisher": "j-256",
   "license": "MIT",
   "repository": {
