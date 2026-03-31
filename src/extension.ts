@@ -49,6 +49,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   log.appendLine(`git-crypt available: ${gitCryptAvailable}`);
   if (!gitCryptAvailable) {
     log.appendLine('Aborting: git-crypt not found in PATH');
+    vscode.window.showWarningMessage(
+      'git-crypt was not found. On macOS and Linux, git-crypt is included ' +
+      'automatically -- reinstall the extension if you\'re on a supported platform. ' +
+      'On Windows, install git-crypt manually.',
+    );
     return;
   }
 
