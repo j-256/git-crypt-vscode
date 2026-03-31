@@ -1,6 +1,6 @@
 {
   "name": "git-crypt-vscode",
-  "displayName": "git-crypt Diff",
+  "displayName": "git-crypt",
   "description": "Makes git-crypt repositories work in the Source Control panel",
   "version": "2.0.0",
   "publisher": "j-256",

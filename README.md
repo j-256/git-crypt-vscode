@@ -1,4 +1,4 @@
-# git-crypt Diff
+# git-crypt
 
 [![CI](https://github.com/j-256/git-crypt-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/j-256/git-crypt-vscode/actions/workflows/ci.yml)
 
@@ -26,7 +26,7 @@ With the extension installed, git-crypt files work like any other file in the So
 
 ## Install
 
-Search "git-crypt Diff" in the Extensions view, or run:
+Search "git-crypt" in the Extensions view, or run:
 
 ```bash
 code --install-extension j-256.git-crypt-vscode
