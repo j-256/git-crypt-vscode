@@ -26,6 +26,14 @@
   "extensionDependencies": [
     "vscode.git"
   ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "git-crypt.installGlobally",
+        "title": "git-crypt: Install git-crypt to system PATH"
+      }
+    ]
+  },
   "main": "./dist/extension.js",
   "scripts": {
     "preversion": "[ \"$(git branch --show-current)\" = main ] || { echo 'Error: npm version must be run on main'; exit 1; } && npm run build && npm test",

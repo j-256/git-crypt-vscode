@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'node:path';
+import * as os from 'node:os';
+import { access, copyFile, chmod, mkdir } from 'node:fs/promises';
 import { isGitCryptAvailable, isRepoUnlocked } from './git.js';
 import { GitCryptDetector } from './detector.js';
 
@@ -91,6 +93,67 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   context.subscriptions.push(
     gitApi.onDidOpenRepository((repo: { rootUri: vscode.Uri }) => {
       scanRepo(repo.rootUri);
+    }),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('git-crypt.installGlobally', async () => {
+      const bundledBinary = path.join(context.extensionPath, 'bin', 'git-crypt');
+      try {
+        await access(bundledBinary);
+      } catch {
+        vscode.window.showErrorMessage(
+          'No bundled git-crypt binary found. Install git-crypt manually.',
+        );
+        return;
+      }
+
+      const options = [
+        { label: '/usr/local/bin', description: 'System-wide (may require sudo)' },
+        { label: '~/.local/bin', description: 'User-local, no sudo needed' },
+        { label: 'Choose location...', description: 'Select a custom directory' },
+      ];
+
+      const picked = await vscode.window.showQuickPick(options, {
+        placeHolder: 'Where should git-crypt be installed?',
+      });
+      if (!picked) return;
+
+      let destDir: string;
+      if (picked.label === 'Choose location...') {
+        const uris = await vscode.window.showOpenDialog({
+          canSelectFiles: false,
+          canSelectFolders: true,
+          canSelectMany: false,
+          openLabel: 'Install here',
+        });
+        if (!uris?.length) return;
+        destDir = uris[0].fsPath;
+      } else {
+        destDir = picked.label.replace('~', os.homedir());
+      }
+
+      const destPath = path.join(destDir, 'git-crypt');
+      try {
+        await mkdir(destDir, { recursive: true });
+        await copyFile(bundledBinary, destPath);
+        await chmod(destPath, 0o755);
+        const onPath = (process.env.PATH ?? '').split(':').includes(destDir);
+        const msg = onPath
+          ? `Installed git-crypt to ${destPath}`
+          : `Installed git-crypt to ${destPath}. Add ${destDir} to your shell PATH.`;
+        vscode.window.showInformationMessage(msg);
+        log.appendLine(msg);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes('EACCES') || msg.includes('permission')) {
+          vscode.window.showErrorMessage(
+            `Permission denied. Run: sudo cp "${bundledBinary}" "${destPath}"`,
+          );
+        } else {
+          vscode.window.showErrorMessage(`Failed to install git-crypt: ${msg}`);
+        }
+      }
     }),
   );
 }
