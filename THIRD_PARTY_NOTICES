@@ -1,0 +1,9 @@
+This extension bundles a git-crypt binary compiled from source.
+
+git-crypt
+  License: GNU General Public License v3.0 (GPLv3)
+  Source:  https://github.com/AGWA/git-crypt
+  Commit:  https://github.com/AGWA/git-crypt/archive/refs/tags/0.8.0.tar.gz
+
+The full text of the GPLv3 license is available at:
+https://www.gnu.org/licenses/gpl-3.0.txt
