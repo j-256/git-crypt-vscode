@@ -2,7 +2,7 @@
 
 ## Repository Overview
 
-VSCode extension that enables viewing diffs of git-crypt encrypted files. Provides decrypted content via `git show --textconv` and opens VSCode's diff editor.
+VSCode extension that makes git-crypt repositories work in the Source Control panel. Augments the extension host's PATH so the git-crypt clean/smudge filter is discoverable, and decorates git-crypt files with a lock badge.
 
 ## Key Commands
 
@@ -17,31 +17,25 @@ npm run package   # Create .vsix package
 
 ```
 src/
-  content-provider.ts # resolveContent(): decodes git-crypt: URI -> decrypted text
-  detector.ts         # GitCryptDetector: cached Set<string> of git-crypt files per repo
-  diff.ts             # showDiff(), registerDiffCommand(): opens vscode.diff editor
-  extension.ts        # Activation, FileDecorationProvider, wiring
-  git.ts              # execFile wrappers for git and git-crypt commands
-  uri-util.ts         # encode/decode git-crypt://<hash>/<ref>/<path>?<repoRoot> URIs
+  detector.ts   # GitCryptDetector: cached Set<string> of git-crypt files per repo
+  extension.ts  # Activation, PATH augmentation, FileDecorationProvider, wiring
+  git.ts        # execFile wrappers for git and git-crypt commands
 test/
-  fixture.ts          # Creates temporary git-crypt repo for tests
-  *.test.ts           # Unit tests (node:test + tsx)
+  fixture.ts    # Creates temporary git-crypt repo for tests
+  *.test.ts     # Unit tests (node:test + tsx)
 ```
 
 ## Key Design Decisions
 
-- **Eager command registration:** Commands and providers are registered before repo scanning completes. The git extension may not have discovered repositories when we activate (`onStartupFinished`), so gating on repo state causes "command not found" errors.
-- **PATH augmentation:** The VSCode extension host has a minimal PATH. `src/git.ts` appends `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin` so `git-crypt` is discoverable.
+- **Eager registration:** Decoration provider is registered before repo scanning completes. The git extension may not have discovered repositories when we activate (`onStartupFinished`), so gating on repo state causes missed decorations.
+- **PATH augmentation:** The VSCode extension host has a minimal PATH. `src/extension.ts` appends `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin` to `process.env.PATH` on the shared extension host so `git-crypt` is discoverable by all extensions (including the built-in git extension's clean/smudge filter invocations). This is the extension's primary function.
 - **Unlock detection via key directory:** `isRepoUnlocked()` checks for `.git/git-crypt/keys/` existence rather than parsing `git-crypt status` output (which is slow on large repos and ambiguous -- it labels managed files as "encrypted:" even when unlocked).
-- **No reactive intercept:** VSCode errors on encrypted blobs before `onDidOpenTextDocument` fires, so auto-redirecting the built-in SCM click is not possible. Users must use the inline icon, right-click, or command palette.
 - **No shell execution:** All git commands use `execFile` with array arguments to prevent command injection.
 
 ## Testing
 
 Tests create a temporary git-crypt repo via `test/fixture.ts` (requires `git-crypt` installed). Tests verify:
 - Git command execution and error handling
-- URI round-trip encoding/decoding
-- Content resolution (decrypted output)
 - Detector file matching and path resolution
 
 ## Release Workflow
@@ -59,9 +53,9 @@ Branches: `main` (releases), `dev` (test-only CI, no publish).
 
 ## Installation (Development)
 
-Symlink into your VSCode extensions directory and rebuild:
+Build and install a local VSIX:
 ```bash
-ln -sf "$(pwd)" ~/.vscode/extensions/git-crypt-vscode
-npm run build
+npm run package
+code --install-extension git-crypt-vscode-*.vsix
 ```
 Reload VSCode to pick up changes.

@@ -1,11 +1,8 @@
 import * as vscode from 'vscode';
 import { isGitCryptAvailable, isRepoUnlocked } from './git.js';
 import { GitCryptDetector } from './detector.js';
-import { resolveContent } from './content-provider.js';
-import { GIT_CRYPT_SCHEME } from './uri-util.js';
-import { registerDiffCommand } from './diff.js';
 
-const log = vscode.window.createOutputChannel('git-crypt Diff');
+const log = vscode.window.createOutputChannel('git-crypt');
 
 class GitCryptDecorationProvider implements vscode.FileDecorationProvider {
   private _onDidChange = new vscode.EventEmitter<vscode.Uri | vscode.Uri[]>();
@@ -20,7 +17,7 @@ class GitCryptDecorationProvider implements vscode.FileDecorationProvider {
     log.appendLine(`Decorating: ${uri.fsPath}`);
     return new vscode.FileDecoration(
       '\u{1F512}',
-      'Encrypted by git-crypt \u2014 use the inline diff icon to view changes',
+      'Encrypted by git-crypt',
     );
   }
 
@@ -35,9 +32,8 @@ const EXTRA_PATH_DIRS = ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin'];
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   log.appendLine('Activating git-crypt-vscode...');
 
-  // Augment process PATH before any git operations -- this also fixes the
-  // built-in git extension's child processes (e.g. git add triggering the
-  // git-crypt clean filter)
+  // Augment process PATH so the built-in git extension's child processes
+  // can find git-crypt (e.g. git add triggering the clean filter)
   const currentPath = process.env.PATH ?? '';
   const missing = EXTRA_PATH_DIRS.filter(d => !currentPath.split(':').includes(d));
   if (missing.length) process.env.PATH = `${currentPath}:${missing.join(':')}`;
@@ -60,17 +56,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   log.appendLine(`Repositories at activation: ${gitApi.repositories.length}`);
 
   const detector = new GitCryptDetector();
-
-  // Register content provider, diff command, and file decorations eagerly
-  context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider(GIT_CRYPT_SCHEME, {
-      async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
-        return resolveContent(uri.toString());
-      },
-    }),
-  );
-
-  registerDiffCommand(context, detector);
 
   const decorationProvider = new GitCryptDecorationProvider(detector);
   context.subscriptions.push(
@@ -98,6 +83,4 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   );
 }
 
-export function deactivate(): void {
-  // Nothing to clean up -- all disposables registered via context.subscriptions
-}
+export function deactivate(): void {}

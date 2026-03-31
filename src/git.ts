@@ -16,7 +16,7 @@ export function gitExec(cwd: string, args: string[], timeout = DEFAULT_TIMEOUT):
       resolve({
         stdout: stdout ?? '',
         stderr: stderr ?? '',
-        code: error ? (error as NodeJS.ErrnoException & { code?: number }).status ?? 1 : 0,
+        code: error ? (error as { status?: number }).status ?? 1 : 0,
       });
     });
   });
@@ -75,10 +75,4 @@ export async function getGitCryptFiles(repoRoot: string): Promise<Set<string>> {
     }
   }
   return cryptFiles;
-}
-
-export async function getTextConv(repoRoot: string, ref: string, relPath: string): Promise<string | null> {
-  const result = await gitExec(repoRoot, ['show', '--textconv', `${ref}:${relPath}`]);
-  if (result.code !== 0) return null;
-  return result.stdout;
 }

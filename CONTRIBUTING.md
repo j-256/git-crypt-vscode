@@ -5,22 +5,6 @@
 ```bash
 git clone https://github.com/j-256/git-crypt-vscode.git && cd git-crypt-vscode
 npm install
-npm run build
-```
-
-Symlink into your VSCode extensions directory:
-
-```bash
-# Standard VSCode
-ln -sf "$(pwd)" ~/.vscode/extensions/git-crypt-vscode
-
-# Portable VSCode (e.g. code-portable-data)
-ln -sf "$(pwd)" /path/to/code-portable-data/extensions/git-crypt-vscode
-```
-
-Reload VSCode after linking. Or build a VSIX:
-
-```bash
 npm run package
 code --install-extension git-crypt-vscode-*.vsix
 ```
@@ -46,15 +30,12 @@ npm test
 
 ```
 src/
-  content-provider.ts # Resolves git-crypt: URIs to decrypted content
-  detector.ts         # Cached set of git-crypt files per repository
-  diff.ts             # Diff command (opens vscode.diff editor)
-  extension.ts        # Activation, wiring, file decoration provider
-  git.ts              # Low-level git/git-crypt command helpers (execFile, no shell)
-  uri-util.ts         # Encode/decode git-crypt: URI scheme
+  detector.ts   # Cached set of git-crypt files per repository
+  extension.ts  # Activation, PATH augmentation, wiring, file decoration provider
+  git.ts        # Low-level git/git-crypt command helpers (execFile, no shell)
 ```
 
-The extension activates lazily (`onStartupFinished`), checks for `git-crypt` availability, scans workspace repositories for git-crypt files via `git check-attr`, and registers commands and providers. All git interaction uses `execFile` with array arguments (no shell) to prevent command injection.
+The extension activates lazily (`onStartupFinished`), augments the extension host's `process.env.PATH` so `git-crypt` is discoverable, checks for `git-crypt` availability, scans workspace repositories for git-crypt files via `git check-attr`, and registers a file decoration provider. All git interaction uses `execFile` with array arguments (no shell) to prevent command injection.
 
 ## Release Workflow
 

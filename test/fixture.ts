@@ -23,7 +23,6 @@ function git(cwd: string, args: string[]): void {
 export interface TestFixture {
   repoRoot: string;
   encryptedFile: string; // relative path
-  encryptedFileContent: string; // known plaintext
   plainFile: string; // relative path
 }
 
@@ -37,8 +36,7 @@ export function createFixture(): TestFixture {
 
   writeFileSync(path.join(repoRoot, '.gitattributes'), 'secret.txt filter=git-crypt diff=git-crypt\n');
 
-  const encryptedFileContent = '#!/bin/bash\nSECRET=hello\n';
-  writeFileSync(path.join(repoRoot, 'secret.txt'), encryptedFileContent);
+  writeFileSync(path.join(repoRoot, 'secret.txt'), '#!/bin/bash\nSECRET=hello\n');
   writeFileSync(path.join(repoRoot, 'plain.txt'), 'plain content\n');
 
   git(repoRoot, ['add', '-A']);
@@ -47,7 +45,6 @@ export function createFixture(): TestFixture {
   return {
     repoRoot,
     encryptedFile: 'secret.txt',
-    encryptedFileContent,
     plainFile: 'plain.txt',
   };
 }

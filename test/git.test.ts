@@ -1,6 +1,6 @@
 import { describe, it, before, after } from 'node:test';
 import * as assert from 'node:assert/strict';
-import { gitExec, isGitCryptAvailable, isRepoUnlocked, getGitCryptFiles, getTextConv } from '../src/git.js';
+import { gitExec, isGitCryptAvailable, isRepoUnlocked, getGitCryptFiles } from '../src/git.js';
 import { createFixture, destroyFixture, type TestFixture } from './fixture.js';
 
 let fixture: TestFixture;
@@ -50,14 +50,3 @@ describe('getGitCryptFiles', () => {
   });
 });
 
-describe('getTextConv', () => {
-  it('returns decrypted content for a git-crypt file', async () => {
-    const content = await getTextConv(fixture.repoRoot, 'HEAD', fixture.encryptedFile);
-    assert.ok(content!.startsWith('#!/bin/bash'));
-  });
-
-  it('returns null for a file not in the given ref', async () => {
-    const content = await getTextConv(fixture.repoRoot, 'HEAD', 'nonexistent-file.txt');
-    assert.equal(content, null);
-  });
-});

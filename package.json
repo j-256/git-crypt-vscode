@@ -1,7 +1,7 @@
 {
   "name": "git-crypt-vscode",
   "displayName": "git-crypt Diff",
-  "description": "View diffs of git-crypt encrypted files in VSCode",
+  "description": "Makes git-crypt repositories work in the Source Control panel",
   "version": "1.0.5",
   "publisher": "j-256",
   "license": "MIT",
@@ -14,10 +14,8 @@
   },
   "keywords": [
     "git-crypt",
-    "diff",
     "encrypted",
-    "scm",
-    "textconv"
+    "scm"
   ],
   "categories": [
     "Other"
@@ -29,33 +27,6 @@
     "vscode.git"
   ],
   "main": "./dist/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "gitCrypt.showDiff",
-        "title": "Git Crypt: Show Diff",
-        "icon": "$(diff)"
-      }
-    ],
-    "menus": {
-      "scm/resourceState/context": [
-        {
-          "command": "gitCrypt.showDiff",
-          "when": "scmProvider == git",
-          "group": "inline"
-        },
-        {
-          "command": "gitCrypt.showDiff",
-          "when": "scmProvider == git"
-        }
-      ],
-      "commandPalette": [
-        {
-          "command": "gitCrypt.showDiff"
-        }
-      ]
-    }
-  },
   "scripts": {
     "preversion": "[ \"$(git branch --show-current)\" = main ] || { echo 'Error: npm version must be run on main'; exit 1; } && npm run build && npm test",
     "postversion": "git push origin main v$npm_package_version",

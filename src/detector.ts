@@ -25,10 +25,6 @@ export class GitCryptDetector {
     return null;
   }
 
-  getRepoRoots(): string[] {
-    return [...this.repos.keys()];
-  }
-
   hasFiles(repoRoot: string): boolean {
     const files = this.repos.get(repoRoot);
     return (files?.size ?? 0) > 0;
