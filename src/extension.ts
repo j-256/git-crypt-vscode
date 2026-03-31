@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'node:path';
 import { isGitCryptAvailable, isRepoUnlocked } from './git.js';
 import { GitCryptDetector } from './detector.js';
 
@@ -33,10 +34,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   log.appendLine('Activating git-crypt-vscode...');
 
   // Augment process PATH so the built-in git extension's child processes
-  // can find git-crypt (e.g. git add triggering the clean filter)
+  // can find git-crypt (e.g. git add triggering the clean filter).
+  // Bundled binary dir is appended last so user-installed git-crypt takes precedence.
+  const bundledBinDir = path.join(context.extensionPath, 'bin');
+  const extraDirs = [...EXTRA_PATH_DIRS, bundledBinDir];
   const currentPath = process.env.PATH ?? '';
-  const missing = EXTRA_PATH_DIRS.filter(d => !currentPath.split(':').includes(d));
+  const missing = extraDirs.filter(d => !currentPath.split(':').includes(d));
   if (missing.length) process.env.PATH = `${currentPath}:${missing.join(':')}`;
+
+  // Inject into integrated terminals so git-crypt is available there too
+  context.environmentVariableCollection.append('PATH', ':' + extraDirs.join(':'));
 
   const gitCryptAvailable = await isGitCryptAvailable();
   log.appendLine(`git-crypt available: ${gitCryptAvailable}`);
