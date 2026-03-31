@@ -93,7 +93,7 @@ jobs:
           path: bin/git-crypt
 
   publish:
-    needs: test
+    needs: [test, build-git-crypt]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
@@ -119,13 +119,43 @@ jobs:
             echo "Error: tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
             exit 1
           fi
-      - run: npm run package
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: git-crypt-*
+          path: artifacts/
+
+      - name: Package platform-specific VSIX files
+        run: |
+          for target in darwin-arm64 darwin-x64 linux-x64 linux-arm64; do
+            mkdir -p bin
+            cp "artifacts/git-crypt-${target}/git-crypt" bin/git-crypt
+            chmod +x bin/git-crypt
+            npx vsce package --target "$target"
+            rm -rf bin
+          done
+
+      - name: Package universal VSIX (no bundled binary)
+        run: npx vsce package
+
+      - name: Verify VSIX contents
+        run: |
+          for f in git-crypt-vscode-*-*.vsix; do
+            echo "=== $f ==="
+            npx vsce ls --packagePath "$f" | grep -c 'bin/git-crypt' | xargs -I{} test {} -eq 1
+          done
+          echo "=== universal ==="
+          UNIVERSAL=$(ls git-crypt-vscode-*.vsix | grep -v -- '-darwin\|-linux')
+          npx vsce ls --packagePath "$UNIVERSAL" | grep -c 'bin/git-crypt' | xargs -I{} test {} -eq 0
+
       - name: Create or update GitHub release
         run: |
           gh release create "$GITHUB_REF_NAME" git-crypt-vscode-*.vsix --title "$GITHUB_REF_NAME" --generate-notes ||
           gh release upload "$GITHUB_REF_NAME" git-crypt-vscode-*.vsix --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm run publish
+
+      - name: Publish to marketplace
+        run: npx vsce publish --packagePath git-crypt-vscode-*.vsix
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
