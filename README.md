@@ -10,7 +10,7 @@ VSCode's extension host process uses a minimal `PATH` that often excludes direct
 
 ## How It Works
 
-The extension appends common installation directories (`/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin`) to `process.env.PATH` on the shared extension host. This makes `git-crypt` discoverable by all extensions, including the built-in git extension. Once the filter works, VSCode's native diff and staging operate correctly on git-crypt files.
+On macOS and Linux, the extension ships a bundled `git-crypt` binary. No separate installation needed -- the extension appends its binary to `PATH` so git's clean/smudge filters just work. If you already have git-crypt installed, your version takes precedence.
 
 Git-crypt files are also decorated with a lock badge so you can identify them at a glance.
 
@@ -20,9 +20,12 @@ With the extension installed, git-crypt files work like any other file in the So
 
 ## Requirements
 
-- [git-crypt](https://github.com/AGWA/git-crypt) installed (`brew install git-crypt` or equivalent)
 - Repository must be unlocked (`git-crypt unlock`)
 - VSCode >= 1.85.0
+- **macOS and Linux:** git-crypt is included automatically
+- **Windows:** Not supported ([git-crypt has limited Windows support](https://github.com/AGWA/git-crypt/blob/master/INSTALL.md))
+
+To install git-crypt system-wide (outside VSCode), run the **git-crypt: Install git-crypt to system PATH** command from the command palette.
 
 ## Install
 
