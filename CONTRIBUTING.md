@@ -54,14 +54,26 @@ This single command:
 
 CI then takes over:
 
-5. Runs tests on the pushed tag
-6. Validates the tag matches package.json version
-7. Packages the VSIX and creates a GitHub release with it attached
-8. Publishes to the VS Code Marketplace
+5. Runs tests
+6. Validates the tag is on `main` and matches package.json version
+7. Builds static git-crypt binaries for macOS (arm64) and Linux (x64, arm64)
+8. Packages platform-specific VSIX files (with bundled binary) and a universal VSIX (without)
+9. Creates a GitHub release with all VSIX files attached
+10. Publishes all VSIX files to the VS Code Marketplace
+
+### Dry Runs
+
+Trigger the full build/package pipeline without publishing:
+
+```bash
+gh workflow run ci.yml --ref dev
+```
+
+This runs with `dry_run=true` (the default), which builds binaries, packages VSIX files, and verifies their contents -- but skips the GitHub release and marketplace publish steps. Uncheck `dry_run` in the GitHub UI to publish from a manual dispatch (only allowed from `main`).
 
 ### Recovery
 
-If CI fails after the tag is pushed (e.g. marketplace timeout), fix the issue and retag:
+**CI fails before publish** (tests, build, packaging): fix the issue and retag:
 
 ```bash
 npm run retag
@@ -69,14 +81,21 @@ npm run retag
 
 This force-moves the tag to the current commit and pushes it, re-triggering CI.
 
+**Marketplace publish fails after GitHub release succeeds**: the marketplace rejects same-version re-publishes, so `retag` alone won't work. Bump the version and release again:
+
+```bash
+npm version patch
+```
+
 ### Branches
 
 - **main** -- releases happen here; `npm version` enforces this via a branch guard
-- **dev** -- CI runs tests only; publish job verifies the tag is on main before proceeding
+- **dev** -- CI runs tests and dry-run builds; publish steps are gated behind `dry_run` input and a main-branch guard
 
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`):
 
-- **test** job runs on every push to `main`/`dev` and on PRs to `main`
-- **publish** job runs only on `v*` tags on `main`, after tests pass
+- **test** -- runs on every push to `main`/`dev` and on PRs to `main`
+- **build-git-crypt** -- compiles static git-crypt binaries on macOS (arm64 via macos-15) and Linux (x64 and arm64 via Alpine Docker, arm64 uses QEMU). Runs on tags and `workflow_dispatch`
+- **publish** -- packages platform-specific and universal VSIX files, verifies contents, optionally creates GitHub release and publishes to marketplace. Release/publish steps are controlled by the `dry_run` input (defaults to true on manual dispatch; always false on tag pushes)

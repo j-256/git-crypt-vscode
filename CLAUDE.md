@@ -28,7 +28,8 @@ test/
 ## Key Design Decisions
 
 - **Eager registration:** Decoration provider is registered before repo scanning completes. The git extension may not have discovered repositories when we activate (`onStartupFinished`), so gating on repo state causes missed decorations.
-- **PATH augmentation:** The VSCode extension host has a minimal PATH. `src/extension.ts` appends `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin` to `process.env.PATH` on the shared extension host so `git-crypt` is discoverable by all extensions (including the built-in git extension's clean/smudge filter invocations). This is the extension's primary function.
+- **PATH augmentation:** The VSCode extension host has a minimal PATH. `src/extension.ts` appends `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin`, and the bundled `bin/` directory to `process.env.PATH` on the shared extension host so `git-crypt` is discoverable by all extensions (including the built-in git extension's clean/smudge filter invocations). User-installed git-crypt takes precedence; the bundled binary is appended last. This is the extension's primary function.
+- **Bundled binary:** Platform-specific VSIX files ship a statically linked git-crypt binary (macOS arm64, Linux x64/arm64). A universal VSIX (no binary) is also published for unsupported platforms. The binary version is pinned in `git-crypt-version.txt` with a sha256 checksum.
 - **Unlock detection via key directory:** `isRepoUnlocked()` checks for `.git/git-crypt/keys/` existence rather than parsing `git-crypt status` output (which is slow on large repos and ambiguous -- it labels managed files as "encrypted:" even when unlocked).
 - **No shell execution:** All git commands use `execFile` with array arguments to prevent command injection.
 
@@ -45,11 +46,13 @@ Tests create a temporary git-crypt repo via `test/fixture.ts` (requires `git-cry
 1. **preversion** -- branch guard (must be on `main`), build, test
 2. Version bump, commit, `v*` tag
 3. **postversion** -- pushes commit + tag to origin
-4. CI: tests -> tag/version mismatch check -> package -> GitHub release -> marketplace publish
+4. CI: tests -> build static binaries -> package platform-specific + universal VSIX -> GitHub release -> marketplace publish
 
-Recovery from CI failure: `npm run retag` (force-moves tag to HEAD, re-triggers CI).
+Recovery from CI failure: `npm run retag` (force-moves tag to HEAD, re-triggers CI). If marketplace publish fails after GH release succeeds, bump version and release again (marketplace rejects same-version re-publishes).
 
-Branches: `main` (releases), `dev` (test-only CI, no publish).
+Dry runs: `gh workflow run ci.yml --ref dev` runs the full build/package pipeline with `dry_run=true` (default). Marketplace publish is also guarded against non-main branches.
+
+Branches: `main` (releases), `dev` (CI runs tests + dry-run builds, no publish).
 
 ## Installation (Development)
 
