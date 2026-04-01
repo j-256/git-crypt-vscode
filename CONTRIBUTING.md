@@ -5,17 +5,19 @@
 ```bash
 git clone https://github.com/j-256/git-crypt-vscode.git && cd git-crypt-vscode
 npm install
-npm run package
-code --install-extension git-crypt-vscode-*.vsix
+npm run reinstall
 ```
+
+Reload VSCode to pick up changes.
 
 ## Commands
 
 ```bash
-npm run build     # Build once (esbuild -> dist/extension.js)
-npm run watch     # Build on change
-npm test          # Run unit tests (node:test + tsx)
-npm run package   # Create .vsix
+npm run build       # Build once (esbuild -> dist/extension.js)
+npm run watch       # Build on change
+npm test            # Run unit tests (node:test + tsx)
+npm run package     # Create .vsix
+npm run reinstall   # Clean, package, and install the extension locally
 ```
 
 ## Testing

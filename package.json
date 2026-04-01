@@ -44,7 +44,8 @@
     "watch": "node esbuild.js --watch",
     "test": "node --import tsx --test test/*.test.ts",
     "package": "vsce package",
-    "publish": "vsce publish"
+    "publish": "vsce publish",
+    "reinstall": "rm -f *.vsix && npm run package && code --install-extension git-crypt-vscode-*.vsix"
   },
   "devDependencies": {
     "@types/vscode": "^1.85.0",

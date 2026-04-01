@@ -7,10 +7,11 @@ VSCode extension that makes git-crypt repositories work in the Source Control pa
 ## Key Commands
 
 ```bash
-npm run build     # Build with esbuild (bundles to dist/extension.js)
-npm run watch     # Build on file change
-npm test          # Run unit tests (node:test + tsx)
-npm run package   # Create .vsix package
+npm run build       # Build with esbuild (bundles to dist/extension.js)
+npm run watch       # Build on file change
+npm test            # Run unit tests (node:test + tsx)
+npm run package     # Create .vsix package
+npm run reinstall   # Clean, package, and install the extension locally
 ```
 
 ## Architecture
@@ -58,7 +59,6 @@ Branches: `main` (releases), `dev` (CI runs tests + dry-run builds, no publish).
 
 Build and install a local VSIX:
 ```bash
-npm run package
-code --install-extension git-crypt-vscode-*.vsix
+npm run reinstall
 ```
 Reload VSCode to pick up changes.
