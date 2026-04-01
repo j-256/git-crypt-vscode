@@ -176,7 +176,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to marketplace
-        if: ${{ !inputs.dry_run }}
+        if: ${{ !inputs.dry_run && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main') }}
         run: npm run publish -- --packagePath git-crypt-vscode-*.vsix
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
