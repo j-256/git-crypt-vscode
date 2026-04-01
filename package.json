@@ -2,7 +2,7 @@
   "name": "git-crypt-vscode",
   "displayName": "git-crypt",
   "description": "Makes git-crypt repositories work in the Source Control panel",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "publisher": "j-256",
   "license": "MIT",
   "repository": {
