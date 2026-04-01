@@ -26,10 +26,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - target: darwin-arm64
-            os: macos-14
-          - target: darwin-x64
-            os: macos-13
+          - target: darwin
+            os: macos-15
           - target: linux-x64
             os: ubuntu-latest
             platform: linux/amd64
@@ -58,7 +56,10 @@ jobs:
           brew install openssl@3
           OPENSSL_DIR="$(brew --prefix openssl@3)"
           cd "git-crypt-${{ steps.version.outputs.version }}"
-          make CXXFLAGS="-O2 -Wall -I${OPENSSL_DIR}/include" LDLIBS="${OPENSSL_DIR}/lib/libcrypto.a"
+          # Makefile uses LDFLAGS += -lcrypto (not overridable via command line).
+          # Patch to link the static archive directly instead.
+          sed -i '' "s|-lcrypto|${OPENSSL_DIR}/lib/libcrypto.a|" Makefile
+          make CXXFLAGS="-O2 -Wall -I${OPENSSL_DIR}/include"
           strip git-crypt
           mkdir -p ../bin
           cp git-crypt ../bin/
@@ -72,8 +73,9 @@ jobs:
         run: |
           docker run --rm --platform "${{ matrix.platform }}" \
             -v "$PWD:/build" -w /build alpine sh -c "
-              apk add g++ make musl-dev openssl-dev file &&
+              apk add g++ make musl-dev openssl-dev openssl-libs-static file &&
               cd git-crypt-${{ steps.version.outputs.version }} &&
+              sed -i 's|-lcrypto|/usr/lib/libcrypto.a|' Makefile &&
               LDFLAGS='-static' make &&
               strip git-crypt &&
               ./git-crypt --version &&
@@ -132,7 +134,12 @@ jobs:
         run: |
           for target in darwin-arm64 darwin-x64 linux-x64 linux-arm64; do
             mkdir -p bin
-            cp "artifacts/git-crypt-${target}/git-crypt" bin/git-crypt
+            # Both darwin targets use the same arm64 binary (Rosetta handles x64)
+            case "$target" in
+              darwin-*) ARTIFACT="darwin" ;;
+              *) ARTIFACT="$target" ;;
+            esac
+            cp "artifacts/git-crypt-${ARTIFACT}/git-crypt" bin/git-crypt
             chmod +x bin/git-crypt
             npx vsce package --target "$target"
             rm -rf bin
