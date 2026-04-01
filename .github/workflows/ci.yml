@@ -141,12 +141,12 @@ jobs:
             esac
             cp "artifacts/git-crypt-${ARTIFACT}/git-crypt" bin/git-crypt
             chmod +x bin/git-crypt
-            npx vsce package --target "$target"
+            npm run package -- --target "$target"
             rm -rf bin
           done
 
       - name: Package universal VSIX (no bundled binary)
-        run: npx vsce package
+        run: npm run package
 
       - name: Verify VSIX contents
         run: |
@@ -172,6 +172,6 @@ jobs:
 
       - name: Publish to marketplace
         if: startsWith(github.ref, 'refs/tags/v')
-        run: npx vsce publish --packagePath git-crypt-vscode-*.vsix
+        run: npm run publish -- --packagePath git-crypt-vscode-*.vsix
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
