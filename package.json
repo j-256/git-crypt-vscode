@@ -21,7 +21,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "*"
   ],
   "extensionDependencies": [
     "vscode.git"
@@ -43,8 +43,8 @@
     "build": "node esbuild.js",
     "watch": "node esbuild.js --watch",
     "test": "node --import tsx --test test/*.test.ts",
-    "package": "vsce package",
-    "publish": "vsce publish",
+    "package": "vsce package --allow-star-activation",
+    "publish": "vsce publish --allow-star-activation",
     "reinstall": "rm -f *.vsix && npm run package && code --install-extension git-crypt-vscode-*.vsix"
   },
   "devDependencies": {

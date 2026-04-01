@@ -37,7 +37,7 @@ src/
   git.ts        # Low-level git/git-crypt command helpers (execFile, no shell)
 ```
 
-The extension activates lazily (`onStartupFinished`), augments the extension host's `process.env.PATH` so `git-crypt` is discoverable, checks for `git-crypt` availability, scans workspace repositories for git-crypt files via `git check-attr`, and registers a file decoration provider. All git interaction uses `execFile` with array arguments (no shell) to prevent command injection.
+The extension uses `*` activation so it can augment `process.env.PATH` before the git extension's async repo discovery triggers clean/smudge filters. `extensionDependencies` on `vscode.git` ensures our activation runs right after the git extension's, and our PATH augmentation is synchronous so it completes before any async git operations execute. The `package` and `publish` npm scripts pass `--allow-star-activation` to vsce to acknowledge this is intentional (our activation is lightweight). After PATH setup, the extension checks for `git-crypt` availability, scans workspace repositories for git-crypt files via `git check-attr`, and registers a file decoration provider. All git interaction uses `execFile` with array arguments (no shell) to prevent command injection.
 
 ## Release Workflow
 
