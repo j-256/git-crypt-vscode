@@ -1,11 +1,14 @@
+.claude/
 .github/
 .gitignore
 .vsixignore
 CLAUDE.md
 CONTRIBUTING.md
+docs/
 esbuild.js
-tsconfig.json
+git-crypt-version.txt
+node_modules/
 src/
 test/
-node_modules/
+tsconfig.json
 **/*.map
