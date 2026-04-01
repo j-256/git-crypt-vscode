@@ -45,7 +45,8 @@
     "test": "node --import tsx --test test/*.test.ts",
     "package": "vsce package --allow-star-activation",
     "publish": "vsce publish --allow-star-activation",
-    "reinstall": "rm -f *.vsix && npm run package && code --install-extension git-crypt-vscode-*.vsix && rm -f *.vsix"
+    "reinstall": "rm -f *.vsix && npm run package && code --install-extension git-crypt-vscode-*.vsix && rm -f *.vsix",
+    "uninstall": "code --uninstall-extension $npm_package_publisher.$npm_package_name"
   },
   "devDependencies": {
     "@types/vscode": "^1.85.0",
