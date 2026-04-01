@@ -30,6 +30,15 @@ export async function isGitCryptAvailable(): Promise<boolean> {
   });
 }
 
+export function resolveGitCryptPath(): Promise<string | undefined> {
+  const cmd = process.platform === 'win32' ? 'where' : 'which';
+  return new Promise(resolve => {
+    execFile(cmd, ['git-crypt'], { timeout: 3000 }, (error, stdout) => {
+      resolve(error ? undefined : stdout.trim());
+    });
+  });
+}
+
 export async function isRepoUnlocked(repoRoot: string): Promise<boolean> {
   // git-crypt lock removes keys; git-crypt unlock restores them
   try {

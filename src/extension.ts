@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import { access, copyFile, chmod, mkdir } from 'node:fs/promises';
-import { isGitCryptAvailable, isRepoUnlocked } from './git.js';
+import { isGitCryptAvailable, resolveGitCryptPath, isRepoUnlocked } from './git.js';
 import { GitCryptDetector } from './detector.js';
 
 const log = vscode.window.createOutputChannel('git-crypt');
@@ -48,7 +48,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   context.environmentVariableCollection.append('PATH', ':' + extraDirs.join(':'));
 
   const gitCryptAvailable = await isGitCryptAvailable();
-  log.appendLine(`git-crypt available: ${gitCryptAvailable}`);
+  if (gitCryptAvailable) {
+    const resolved = await resolveGitCryptPath();
+    const source = resolved?.startsWith(bundledBinDir) ? 'bundled' : 'system';
+    log.appendLine(`git-crypt available: ${resolved} (${source})`);
+  }
   if (!gitCryptAvailable) {
     log.appendLine('Aborting: git-crypt not found in PATH');
     vscode.window.showWarningMessage(
