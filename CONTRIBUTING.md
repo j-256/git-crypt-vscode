@@ -49,10 +49,10 @@ npm version patch   # or minor, major
 
 This single command:
 
-1. **preversion** -- verifies you're on `main`, runs build + tests
+1. **preversion** — verifies you're on `main`, runs build + tests
 2. Bumps version in package.json
 3. Commits the version bump and creates a `v*` tag
-4. **postversion** -- pushes the commit and tag to origin
+4. **postversion** — pushes the commit and tag to origin
 
 CI then takes over:
 
@@ -71,7 +71,7 @@ Trigger the full build/package pipeline without publishing:
 gh workflow run ci.yml --ref dev
 ```
 
-This runs with `dry_run=true` (the default), which builds binaries, packages VSIX files, and verifies their contents -- but skips the GitHub release and marketplace publish steps. Uncheck `dry_run` in the GitHub UI to publish from a manual dispatch (only allowed from `main`).
+This runs with `dry_run=true` (the default), which builds binaries, packages VSIX files, and verifies their contents — but skips the GitHub release and marketplace publish steps. Uncheck `dry_run` in the GitHub UI to publish from a manual dispatch (only allowed from `main`).
 
 ### Recovery
 
@@ -91,13 +91,13 @@ npm version patch
 
 ### Branches
 
-- **main** -- releases happen here; `npm version` enforces this via a branch guard
-- **dev** -- CI runs tests and dry-run builds; publish steps are gated behind `dry_run` input and a main-branch guard
+- **main** — releases happen here; `npm version` enforces this via a branch guard
+- **dev** — CI runs tests and dry-run builds; publish steps are gated behind `dry_run` input and a main-branch guard
 
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`):
 
-- **test** -- runs on every push to `main`/`dev` and on PRs to `main`
-- **build-git-crypt** -- compiles static git-crypt binaries on macOS (arm64 via macos-15) and Linux (x64 and arm64 via Alpine Docker, arm64 uses QEMU). Runs on tags and `workflow_dispatch`
-- **publish** -- packages platform-specific and universal VSIX files, verifies contents, optionally creates GitHub release and publishes to marketplace. Release/publish steps are controlled by the `dry_run` input (defaults to true on manual dispatch; always false on tag pushes)
+- **test** — runs on every push to `main`/`dev` and on PRs to `main`
+- **build-git-crypt** — compiles static git-crypt binaries on macOS (arm64 via macos-15) and Linux (x64 and arm64 via Alpine Docker, arm64 uses QEMU). Runs on tags and `workflow_dispatch`
+- **publish** — packages platform-specific and universal VSIX files, verifies contents, optionally creates GitHub release and publishes to marketplace. Release/publish steps are controlled by the `dry_run` input (defaults to true on manual dispatch; always false on tag pushes)

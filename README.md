@@ -6,17 +6,17 @@ VSCode extension that makes [git-crypt](https://github.com/AGWA/git-crypt) repos
 
 ## The Problem
 
-VSCode's extension host process uses a minimal `PATH` that often excludes directories like `/opt/homebrew/bin` -- even when VSCode is launched from a terminal with the full PATH configured. This means the `git-crypt` clean/smudge filter fails with `git-crypt: command not found`, which can prevent the entire repository from loading in the SCM panel.
+VSCode's extension host process uses a minimal `PATH` that often excludes directories like `/opt/homebrew/bin` — even when VSCode is launched from a terminal with the full PATH configured. This means the `git-crypt` clean/smudge filter fails with `git-crypt: command not found`, which can prevent the entire repository from loading in the SCM panel.
 
 ## How It Works
 
-On macOS and Linux, the extension ships a bundled `git-crypt` binary. No separate installation needed -- the extension appends its binary to `PATH` so git's clean/smudge filters just work. If you already have git-crypt installed, your version takes precedence.
+On macOS and Linux, the extension ships a bundled `git-crypt` binary. No separate installation needed — the extension appends its binary to `PATH` so git's clean/smudge filters just work. If you already have git-crypt installed, your version takes precedence.
 
 Git-crypt files are also decorated with a lock badge so you can identify them at a glance.
 
 ## Usage
 
-With the extension installed, git-crypt files work like any other file in the Source Control panel -- double-click to diff, stage with the `+` icon, etc.
+With the extension installed, git-crypt files work like any other file in the Source Control panel — double-click to diff, stage with the `+` icon, etc.
 
 ## Requirements
 
