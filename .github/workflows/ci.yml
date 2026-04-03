@@ -175,6 +175,12 @@ jobs:
           fi
           echo "All VSIX contents verified"
 
+      - name: Publish to marketplace
+        if: ${{ !inputs.dry_run && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main') }}
+        run: npm run publish -- --packagePath git-crypt-vscode-*.vsix
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
       - name: Create or update GitHub release
         if: startsWith(github.ref, 'refs/tags/v') && !inputs.dry_run
         run: |
@@ -182,9 +188,3 @@ jobs:
           gh release upload "$GITHUB_REF_NAME" git-crypt-vscode-*.vsix --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish to marketplace
-        if: ${{ !inputs.dry_run && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main') }}
-        run: npm run publish -- --packagePath git-crypt-vscode-*.vsix
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}

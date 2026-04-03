@@ -60,8 +60,8 @@ CI then takes over:
 6. Validates the tag is on `main` and matches package.json version
 7. Builds static git-crypt binaries for macOS (arm64) and Linux (x64, arm64)
 8. Packages platform-specific VSIX files (with bundled binary) and a universal VSIX (without)
-9. Creates a GitHub release with all VSIX files attached
-10. Publishes all VSIX files to the VS Code Marketplace
+9. Publishes all VSIX files to the VS Code Marketplace
+10. Creates a GitHub release with all VSIX files attached
 
 ### Dry Runs
 
@@ -75,19 +75,13 @@ This runs with `dry_run=true` (the default), which builds binaries, packages VSI
 
 ### Recovery
 
-**CI fails before publish** (tests, build, packaging): fix the issue and retag:
+**CI fails before or during publish**: fix the issue and retag:
 
 ```bash
 npm run retag
 ```
 
-This force-moves the tag to the current commit and pushes it, re-triggering CI.
-
-**Marketplace publish fails after GitHub release succeeds**: the marketplace rejects same-version re-publishes, so `retag` alone won't work. Bump the version and release again:
-
-```bash
-npm version patch
-```
+This force-moves the tag to the current commit and pushes it, re-triggering CI. Marketplace publish runs before GitHub release creation, so a publish failure leaves no orphaned release to clean up.
 
 ### Branches
 

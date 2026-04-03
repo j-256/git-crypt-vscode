@@ -48,9 +48,9 @@ Tests create a temporary git-crypt repo via `test/fixture.ts` (requires `git-cry
 1. **preversion** -- branch guard (must be on `main`), build, test
 2. Version bump, commit, `v*` tag
 3. **postversion** -- pushes commit + tag to origin
-4. CI: tests -> build static binaries -> package platform-specific + universal VSIX -> GitHub release -> marketplace publish
+4. CI: tests -> build static binaries -> package platform-specific + universal VSIX -> marketplace publish -> GitHub release
 
-Recovery from CI failure: `npm run retag` (force-moves tag to HEAD, re-triggers CI). If marketplace publish fails after GH release succeeds, bump version and release again (marketplace rejects same-version re-publishes).
+Recovery from CI failure: `npm run retag` (force-moves tag to HEAD, re-triggers CI). Marketplace publish runs before GH release creation, so a publish failure leaves no orphaned release to clean up.
 
 Dry runs: `gh workflow run ci.yml --ref dev` runs the full build/package pipeline with `dry_run=true` (default). Marketplace publish is also guarded against non-main branches.
 
