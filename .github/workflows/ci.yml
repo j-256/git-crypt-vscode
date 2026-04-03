@@ -158,11 +158,19 @@ jobs:
           for f in git-crypt-vscode-*-*.vsix; do
             echo "=== $f ==="
             unzip -l "$f" | grep -q 'bin/git-crypt' || { echo "FAIL: bin/git-crypt missing from $f"; exit 1; }
+            if unzip -l "$f" | grep -q 'artifacts/'; then
+              echo "FAIL: artifacts/ should not be in $f"
+              exit 1
+            fi
           done
           echo "=== universal ==="
           UNIVERSAL=$(ls git-crypt-vscode-*.vsix | grep -v -- '-darwin\|-linux')
           if unzip -l "$UNIVERSAL" | grep -q 'bin/git-crypt'; then
             echo "FAIL: bin/git-crypt should not be in universal $UNIVERSAL"
+            exit 1
+          fi
+          if unzip -l "$UNIVERSAL" | grep -q 'artifacts/'; then
+            echo "FAIL: artifacts/ should not be in universal $UNIVERSAL"
             exit 1
           fi
           echo "All VSIX contents verified"

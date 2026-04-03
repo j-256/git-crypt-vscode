@@ -1,6 +1,7 @@
 .claude/
 .github/
 .gitignore
+artifacts/
 .vsixignore
 CLAUDE.md
 CONTRIBUTING.md
