@@ -49,10 +49,10 @@
     "uninstall": "code --uninstall-extension j-256.git-crypt-vscode"
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
-    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.125.0",
+    "@types/node": "^26.2.0",
     "esbuild": "^0.28.2",
-    "tsx": "^4.0.0",
-    "@vscode/vsce": "^3.0.0"
+    "tsx": "^4.23.12",
+    "@vscode/vsce": "^3.9.2"
   }
 }
