@@ -13,6 +13,9 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -71,7 +74,7 @@ jobs:
 
       - name: Set up QEMU
         if: matrix.platform == 'linux/arm64'
-        uses: docker/setup-qemu-action@v4
+        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4
 
       - name: Build (Linux static)
         if: runner.os == 'Linux'
