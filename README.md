@@ -4,6 +4,8 @@
 
 VSCode extension that makes [git-crypt](https://github.com/AGWA/git-crypt) repositories work in the Source Control panel.
 
+![A git-crypt repository in VS Code with the encrypted file marked by the extension's lock badge](docs/screenshots/cover.png)
+
 ## The Problem
 
 VSCode's extension host process uses a minimal `PATH` that often excludes directories like `/opt/homebrew/bin` — even when VSCode is launched from a terminal with the full PATH configured. This means the `git-crypt` clean/smudge filter fails with `git-crypt: command not found`, which can prevent the entire repository from loading in the SCM panel.
