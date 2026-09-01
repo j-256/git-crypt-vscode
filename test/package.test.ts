@@ -3,6 +3,8 @@ import { describe, it } from 'node:test';
 import * as assert from 'node:assert/strict';
 
 const PACKAGE_PATH = new URL('../package.json', import.meta.url);
+const VSCODE_IGNORE_PATH = new URL('../.vscodeignore', import.meta.url);
+const BUILD_ONLY_FILES = ['esbuild.js', 'esbuild-arguments.js'];
 const ENGINE_VERSION_PATTERN = /^\^(\d+)\.(\d+)\.\d+$/;
 const TYPES_VERSION_PATTERN = /^(\d+)\.(\d+)\.\d+$/;
 
@@ -30,5 +32,19 @@ describe('VS Code API compatibility', () => {
       typesMatch.slice(1, 3),
       '@types/vscode must match engines.vscode at the major and minor API level',
     );
+  });
+});
+
+describe('VSIX contents', () => {
+  it('excludes build-only scripts', async () => {
+    const ignoredPaths = new Set(
+      (await readFile(VSCODE_IGNORE_PATH, 'utf8'))
+        .split(/\r?\n/)
+        .filter(Boolean),
+    );
+
+    for (const buildOnlyFile of BUILD_ONLY_FILES) {
+      assert.ok(ignoredPaths.has(buildOnlyFile), `${buildOnlyFile} must be excluded from the VSIX`);
+    }
   });
 });

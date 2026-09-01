@@ -1,6 +1,8 @@
 const esbuild = require('esbuild');
-
-const watch = process.argv.includes('--watch');
+const {
+  ESBUILD_USAGE,
+  parseBuildArguments,
+} = require('./esbuild-arguments');
 
 /** @type {import('esbuild').BuildOptions} */
 const opts = {
@@ -14,8 +16,20 @@ const opts = {
   sourcemap: true,
 };
 
-if (watch) {
-  esbuild.context(opts).then(ctx => ctx.watch());
-} else {
-  esbuild.build(opts);
+async function main() {
+  const arguments_ = parseBuildArguments(process.argv.slice(2));
+  if (arguments_.help) {
+    process.stdout.write(ESBUILD_USAGE);
+  } else if (arguments_.watch) {
+    const context = await esbuild.context(opts);
+    await context.watch();
+  } else {
+    await esbuild.build(opts);
+  }
 }
+
+main().catch(error => {
+  const message = error instanceof Error ? error.message : String(error);
+  process.stderr.write(`git-crypt-vscode build: ${message}\n`);
+  process.exitCode = 1;
+});

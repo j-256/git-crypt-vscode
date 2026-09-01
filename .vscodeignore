@@ -8,6 +8,7 @@ CLAUDE.md
 CONTRIBUTING.md
 docs/
 esbuild.js
+esbuild-arguments.js
 git-crypt-version.txt
 node_modules/
 src/
