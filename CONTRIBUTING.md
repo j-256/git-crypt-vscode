@@ -35,9 +35,10 @@ src/
   detector.ts   # Cached set of git-crypt files per repository
   extension.ts  # Activation, PATH augmentation, wiring, file decoration provider
   git.ts        # Low-level git/git-crypt command helpers (execFile, no shell)
+  repository-refresh.ts # Debounced refreshes after Git repository state changes
 ```
 
-The extension uses `*` activation so it can augment `process.env.PATH` before the git extension's async repo discovery triggers clean/smudge filters. `extensionDependencies` on `vscode.git` ensures our activation runs right after the git extension's, and our PATH augmentation is synchronous so it completes before any async git operations execute. The `package` and `publish` npm scripts pass `--allow-star-activation` to vsce to acknowledge this is intentional (our activation is lightweight). After PATH setup, the extension checks for `git-crypt` availability, scans workspace repositories for git-crypt files via `git check-attr`, and registers a file decoration provider. All git interaction uses `execFile` with array arguments (no shell) to prevent command injection.
+The extension uses `*` activation so it can augment `process.env.PATH` before the git extension's async repo discovery triggers clean/smudge filters. `extensionDependencies` on `vscode.git` ensures our activation runs right after the git extension's, and our PATH augmentation is synchronous so it completes before any async git operations execute. The `package` and `publish` npm scripts pass `--allow-star-activation` to vsce to acknowledge this is intentional (our activation is lightweight). After PATH setup, the extension checks for `git-crypt` availability, scans workspace repositories for git-crypt files via `git check-attr`, and registers a file decoration provider. Repository state changes trigger debounced, serialized rescans so tracked paths and `.gitattributes` changes update decorations without reloading the window. All git interaction uses `execFile` with array arguments (no shell) to prevent command injection.
 
 ## Release Workflow
 

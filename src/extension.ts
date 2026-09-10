@@ -4,11 +4,12 @@ import * as os from 'node:os';
 import { access, copyFile, chmod, mkdir } from 'node:fs/promises';
 import { isGitCryptAvailable, resolveGitCryptPath, isRepoUnlocked } from './git.js';
 import { GitCryptDetector } from './detector.js';
+import { RepositoryRefreshController, type GitRepositoryLike } from './repository-refresh.js';
 
 const log = vscode.window.createOutputChannel('git-crypt');
 
 class GitCryptDecorationProvider implements vscode.FileDecorationProvider {
-  private _onDidChange = new vscode.EventEmitter<vscode.Uri | vscode.Uri[]>();
+  private _onDidChange = new vscode.EventEmitter<vscode.Uri | vscode.Uri[] | undefined>();
   readonly onDidChangeFileDecorations = this._onDidChange.event;
 
   constructor(private detector: GitCryptDetector) {}
@@ -80,9 +81,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.window.registerFileDecorationProvider(decorationProvider),
   );
 
-  // Scan repos asynchronously -- handles both already-loaded and late-arriving repos
-  async function scanRepo(rootUri: vscode.Uri): Promise<void> {
-    const root = rootUri.fsPath;
+  // Scan repos asynchronously -- handles initial discovery and later Git state changes
+  async function scanRepo(root: string): Promise<void> {
     if (await isRepoUnlocked(root)) {
       await detector.refresh(root);
       decorationProvider.refresh();
@@ -90,13 +90,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }
   }
 
+  const repositoryRefresh = new RepositoryRefreshController(scanRepo, {
+    onError: (root, error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      log.appendLine(`Failed to scan ${root}: ${message}`);
+    },
+  });
+  context.subscriptions.push(repositoryRefresh);
+
   for (const repo of gitApi.repositories) {
-    scanRepo(repo.rootUri);
+    repositoryRefresh.track(repo);
   }
 
   context.subscriptions.push(
-    gitApi.onDidOpenRepository((repo: { rootUri: vscode.Uri }) => {
-      scanRepo(repo.rootUri);
+    gitApi.onDidOpenRepository((repo: GitRepositoryLike) => {
+      repositoryRefresh.track(repo);
+    }),
+    gitApi.onDidCloseRepository((repo: GitRepositoryLike) => {
+      repositoryRefresh.untrack(repo);
     }),
   );
 

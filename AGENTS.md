@@ -21,6 +21,7 @@ src/
   detector.ts   # GitCryptDetector: cached Set<string> of git-crypt files per repo
   extension.ts  # Activation, PATH augmentation, FileDecorationProvider, wiring
   git.ts        # execFile wrappers for git and git-crypt commands
+  repository-refresh.ts # Debounced, serialized rescans after repository changes
 test/
   fixture.ts    # Creates temporary git-crypt repo for tests
   *.test.ts     # Unit tests (node:test + tsx)
@@ -33,6 +34,7 @@ test/
 - **PATH augmentation:** The VSCode extension host has a minimal PATH. `src/extension.ts` appends `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin`, and the bundled `bin/` directory to `process.env.PATH` on the shared extension host so `git-crypt` is discoverable by all extensions (including the built-in git extension's clean/smudge filter invocations). User-installed git-crypt takes precedence; the bundled binary is appended last. This is the extension's primary function.
 - **Bundled binary:** Platform-specific VSIX files ship a statically linked git-crypt binary (macOS arm64, Linux x64/arm64). A universal VSIX (no binary) is also published for unsupported platforms. The binary version is pinned in `git-crypt-version.txt` with a sha256 checksum.
 - **Unlock detection via key directory:** `isRepoUnlocked()` checks for `.git/git-crypt/keys/` existence rather than parsing `git-crypt status` output (which is slow on large repos and ambiguous -- it labels managed files as "encrypted:" even when unlocked).
+- **Live decoration refresh:** Repository state changes trigger debounced, serialized rescans so newly tracked, removed, or reclassified git-crypt paths update without reloading VS Code.
 - **No shell execution:** All git commands use `execFile` with array arguments to prevent command injection.
 
 ## Testing
@@ -40,6 +42,7 @@ test/
 Tests create a temporary git-crypt repo via `test/fixture.ts` (requires `git-crypt` installed). Tests verify:
 - Git command execution and error handling
 - Detector file matching and path resolution
+- Debounced live refreshes and repository cleanup
 
 ## Release Workflow
 

@@ -16,6 +16,8 @@ On macOS and Linux, the extension ships a bundled `git-crypt` binary. No separat
 
 Git-crypt files are also decorated with a lock badge so you can identify them at a glance.
 
+Lock badges refresh automatically when Git detects repository changes, including newly tracked files and `.gitattributes` updates.
+
 ## Usage
 
 With the extension installed, git-crypt files work like any other file in the Source Control panel — double-click to diff, stage with the `+` icon, etc.
