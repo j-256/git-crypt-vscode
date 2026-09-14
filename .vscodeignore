@@ -15,3 +15,4 @@ src/
 test/
 tsconfig.json
 **/*.map
+tools/

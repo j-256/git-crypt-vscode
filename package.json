@@ -47,7 +47,8 @@
     "package": "vsce package --allow-star-activation",
     "publish": "vsce publish --allow-star-activation",
     "reinstall": "rm -f *.vsix && npm run package && code --install-extension git-crypt-vscode-*.vsix && rm -f *.vsix",
-    "uninstall": "code --uninstall-extension j-256.git-crypt-vscode"
+    "uninstall": "code --uninstall-extension j-256.git-crypt-vscode",
+    "capture:cover": "npm run build && node --import tsx tools/cover/capture.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.5.0",

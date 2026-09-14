@@ -47,6 +47,10 @@ code --install-extension j-256.git-crypt-vscode
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, architecture, and release workflow.
 
+## Project cover automation
+
+The cover launches a pinned VS Code build with the extension in an isolated profile and a disposable git-crypt repository. It requires `git-crypt`; Linux also requires a display, supplied by `xvfb-run -a` in CI. The capture downloads VS Code on first use and keeps its cache under `tools/cover/.vscode-test`. Install the capture tooling with `npm ci --prefix tools/cover` and `npm exec --prefix tools/cover -- playwright install chromium`, then run `npm run capture:cover`. Use `-- --output FILE` to write a review image elsewhere. CI captures during source verification and retains the image as an artifact. Successful main builds publish a changed `docs/screenshots/cover.png` with an image-only commit; pull requests render without publishing, and superseded revisions skip publication.
+
 ## License
 
 MIT
