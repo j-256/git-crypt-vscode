@@ -11,6 +11,8 @@ import { outputPath } from './browser.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const output = outputPath(root, 'Capture VS Code with the built extension and a disposable git-crypt repository.');
 const VERSION = '1.137.0';
+const COVER_VIEWPORT = Object.freeze({ width: 1440, height: 900 });
+const COVER_PIXEL_DENSITY = 4;
 const executablePath = await downloadAndUnzipVSCode({ version: VERSION, cachePath: join(root, 'tools/cover/.vscode-test') });
 const fixture = createFixture();
 const profile = await mkdtemp(join(tmpdir(), 'git-crypt-cover-profile-'));
@@ -36,7 +38,11 @@ try {
     `--extensionDevelopmentPath=${root}`, workspace,
   ] });
   const page = await app.firstWindow();
-  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.setViewportSize(COVER_VIEWPORT);
+  const session = await page.context().newCDPSession(page);
+  await session.send('Emulation.setDeviceMetricsOverride', {
+    ...COVER_VIEWPORT, deviceScaleFactor: COVER_PIXEL_DENSITY, mobile: false,
+  });
   await page.getByText('secret.txt', { exact: true }).first().waitFor({ timeout: 60_000 });
   await page.getByText('secret.txt', { exact: true }).first().dblclick();
   const secondary = page.locator('[id="workbench.parts.auxiliarybar"]');
@@ -52,7 +58,14 @@ try {
   const body = await page.locator('body').innerText();
   assert.ok(body.includes('SECRET=hello'), 'The fixture must be open in the editor');
   await mkdir(dirname(output), { recursive: true });
-  await page.screenshot({ path: output });
+  const screenshot = await session.send('Page.captureScreenshot', {
+    format: 'png', fromSurface: true, captureBeyondViewport: true,
+    clip: { x: 0, y: 0, ...COVER_VIEWPORT, scale: 1 },
+  });
+  const png = Buffer.from(screenshot.data, 'base64');
+  assert.equal(png.readUInt32BE(16), COVER_VIEWPORT.width * COVER_PIXEL_DENSITY);
+  assert.equal(png.readUInt32BE(20), COVER_VIEWPORT.height * COVER_PIXEL_DENSITY);
+  await writeFile(output, png);
   console.log(`Captured ${output}`);
 } finally {
   if (app) await app.close();
