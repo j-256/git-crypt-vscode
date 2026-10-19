@@ -4,7 +4,6 @@
 artifacts/
 .vsixignore
 AGENTS.md
-CLAUDE.md
 CONTRIBUTING.md
 docs/
 esbuild.js
