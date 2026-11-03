@@ -56,5 +56,9 @@
     "@vscode/vsce": "^4.0.0",
     "esbuild": "^0.28.2",
     "tsx": "^4.23.15"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1",
+    "qs": "^6.17.1"
   }
 }
